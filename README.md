@@ -55,6 +55,19 @@ This is a simple console application implementing the Fourier Transform Algorith
     ```sh
     pip install -r requirements.txt
     ```
+1. Install Mingwx64 on your machine. (i.e. using chocolatey)
+    - Install Chocolatey Following the instruction here:
+        https://chocolatey.org/install
+    - Install Mingwx64 using chocolatey command line tools
+        https://community.chocolatey.org/packages/mingw
+    - Make Sure that the chocolatey bin folder is prioritized first at the PATH environment
+
+1. Compile the C++ file into the shared library (.so file)
+
+    ```sh
+    g++ -shared -fPIC -o library.so main.cpp
+    ```
+
 1. Run the application
     ```sh
     python main.py
