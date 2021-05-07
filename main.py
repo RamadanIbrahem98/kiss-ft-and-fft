@@ -3,8 +3,6 @@ import numpy as np
 import matplotlib.pyplot as plt
 from sklearn.metrics import mean_squared_error
 
-
-
 a = CPP('./library.so')
 
 dft_N = np.arange(1, 5000, 100)
