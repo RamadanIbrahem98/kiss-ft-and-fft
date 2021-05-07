@@ -1,44 +1,44 @@
-import ctypes
+from CPP import CPP
 import numpy as np
-from numpy import ctypeslib
 import matplotlib.pyplot as plt
-import time
 from sklearn.metrics import mean_squared_error
 
-class CPP():
-    def __init__(self, path):
-        self.cpp = ctypes.CDLL(path)
 
-        self.dft = self.cpp.dft
-        self.dft.argtypes = [ctypeslib.ndpointer(ctypes.c_double), ctypeslib.ndpointer(ctypes.c_double), ctypes.c_int]
-        
-        self.fft = self.cpp.fft
-        self.fft.argtypes = [ctypeslib.ndpointer(ctypes.c_double), ctypes.c_int]
 
-    def get_dft(self, N: int):
-        t = np.arange(0, N, 1)
-        x = 1*np.cos(2 * np.pi / 1024 * 500 * t)
-        y = 0*np.sin(2 * np.pi / 1024 * 3 * t)
+a = CPP('./library.so')
 
-        input = np.column_stack((x, y))
-        output = np.column_stack((x, y))
+dft_N = np.arange(1, 5000, 100)
+dft_times = []
+for x in dft_N:
+    dft, timing = a.get_dft(x)
+    dft_times.append(timing)
 
-        start = time.time() * 1000
-        self.dft(input, output, N)
-        end = time.time() * 1000
+fft_N = np.arange(1, 5_00_000, 80_000)
+fft_times = []
+for x in fft_N:
+    fft, timing = a.get_fft(x)
+    fft_times.append(timing)
 
-        return (output, end-start)
+dft, timing = a.get_dft(1024)
+fft, timing = a.get_fft(1024)
 
-    def get_fft(self, N: int):
-        t = np.arange(0, N, 1)
-        x = 1*np.cos(2 * np.pi / 1024 * 500 * t)
-        y = 0*np.sin(2 * np.pi / 1024 * 3 * t)
 
-        input = np.column_stack((x, y))
+fig, (ax1, ax2, ax3) = plt.subplots(1, 3, constrained_layout=True, sharey=False)
+ax1.plot(dft_N, dft_times)
+ax1.set_title('DFT Time Complixity')
+ax1.set_xlabel('Length of input Array (N)')
+ax1.set_ylabel('time (ms)')
 
-        start = time.time() * 1000
-        self.fft(input, N)
-        end = time.time() * 1000
+ax2.plot(fft_N, fft_times)
+ax2.set_title('FFT Time Complixity')
+ax2.set_xlabel('Length of input Array (N)')
+ax2.set_ylabel('time (ms)')
 
-        return (input, end-start)
+ax3.plot(fft, dft)
+ax3.set_title('FFT vs DFT Output')
+ax3.set_xlabel('FFT')
+ax3.set_ylabel('DFT')
 
+x = mean_squared_error(fft, dft)
+fig.suptitle(f'Difference Between DFT and FFT Complixty\nMean Squared Error is: {x}', fontsize=16)
+plt.show()
